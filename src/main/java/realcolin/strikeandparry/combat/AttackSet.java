@@ -12,7 +12,7 @@ public record AttackSet(String id, List<Attack> attacks) {
     }
 
     public Attack get(int index) {
-        return attacks.get(index % attacks.size());
+        return attacks.get(Math.floorMod(index, attacks.size()));
     }
 
     public int size() {

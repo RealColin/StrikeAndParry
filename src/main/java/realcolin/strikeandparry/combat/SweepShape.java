@@ -3,19 +3,9 @@ package realcolin.strikeandparry.combat;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
-
 public record SweepShape(double reach, double sweepAngle, double thickness, double rollAngle) implements AttackShape{
-    @Override
-    public List<LivingEntity> getTargets(LivingEntity attacker) {
-        return getCandidates(attacker)
-                .stream()
-                .filter(target -> intersects(attacker, target))
-                .toList();
-    }
-
     public Vec3 support(LivingEntity attacker, Vec3 direction) {
-        var origin = attacker.getBoundingBox().getCenter();
+        var origin = getOrigin(attacker);
 
         // Build the sweep's local coordinate system
         var forward = attacker.getLookAngle().normalize();

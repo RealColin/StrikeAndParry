@@ -20,7 +20,9 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.HandlerThread;
 import realcolin.strikeandparry.Constants;
+import realcolin.strikeandparry.network.PlayAnimationPayload;
 import realcolin.strikeandparry.network.TryStartAttackPayload;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
@@ -51,7 +53,7 @@ public class EventHandler {
 
     @SubscribeEvent
     static void registerClientPayloadHandlers(RegisterClientPayloadHandlersEvent event) {
-
+        event.register(PlayAnimationPayload.TYPE, PayloadHandler::handlePlayAnimation);
     }
 
     @SubscribeEvent
