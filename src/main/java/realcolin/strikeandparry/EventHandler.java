@@ -1,8 +1,11 @@
 package realcolin.strikeandparry;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.SweepAttackEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -30,5 +33,16 @@ public class EventHandler {
             return;
 
         CombatController.tickCombat(livingEntity);
+    }
+
+    @SubscribeEvent
+    public static void onVanillaAttack(AttackEntityEvent event) {
+        if (event.getEntity() instanceof ServerPlayer)
+            event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onVanillaSweep(SweepAttackEvent event) {
+        event.setSweeping(false);
     }
 }

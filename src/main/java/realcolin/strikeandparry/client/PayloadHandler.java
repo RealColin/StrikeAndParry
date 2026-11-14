@@ -2,7 +2,6 @@ package realcolin.strikeandparry.client;
 
 import com.zigythebird.playeranim.animation.PlayerAnimationController;
 import com.zigythebird.playeranim.api.PlayerAnimationAccess;
-import com.zigythebird.playeranim.api.PlayerAnimationFactory;
 import com.zigythebird.playeranimcore.animation.layered.modifier.SpeedModifier;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Avatar;

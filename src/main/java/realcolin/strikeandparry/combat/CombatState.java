@@ -1,7 +1,6 @@
 package realcolin.strikeandparry.combat;
 
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 
 public class CombatState {
 
@@ -91,8 +90,4 @@ public class CombatState {
         activeAttack = null;
     }
 
-    public void debugPrint(LivingEntity entity) {
-        if (attacking)
-            System.out.println(entity.level().getGameTime() + ", current tick / total ticks: " + attackTick + "/" + attackDurationTicks);
-    }
 }

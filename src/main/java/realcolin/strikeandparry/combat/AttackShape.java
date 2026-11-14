@@ -1,5 +1,6 @@
 package realcolin.strikeandparry.combat;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
@@ -15,13 +16,13 @@ public interface AttackShape {
     double EPSILON = 1e-8;
     double EPSILON_SQR = EPSILON * EPSILON;
 
-    default List<LivingEntity> getTargets(LivingEntity attacker) {
+    default List<Entity> getTargets(LivingEntity attacker) {
         return getCandidates(attacker).stream()
                 .filter(target -> hasUnobstructedHit(attacker, target))
                 .toList();
     }
 
-    private boolean hasUnobstructedHit(LivingEntity attacker, LivingEntity target) {
+    private boolean hasUnobstructedHit(LivingEntity attacker, Entity target) {
         var collision = checkCollision(attacker, target);
         if (!collision.intersects())
             return false;
@@ -67,13 +68,14 @@ public interface AttackShape {
                 .subtract(0.0, attacker.getBbHeight() * 0.15, 0.0);
     }
 
-    default List<LivingEntity> getCandidates(LivingEntity attacker) {
+    default List<Entity> getCandidates(LivingEntity attacker) {
         var searchBox = attacker.getBoundingBox().inflate(reach());
 
-        return attacker.level().getEntitiesOfClass(LivingEntity.class, searchBox, target -> target != attacker);
+        return attacker.level().getEntities(attacker, searchBox,
+                target -> TargetSelector.canTarget(attacker, target));
     }
 
-    default Vec3 supportAABB(LivingEntity target, Vec3 direction) {
+    default Vec3 supportAABB(Entity target, Vec3 direction) {
         return supportAABB(target.getBoundingBox(), direction);
     }
 
@@ -103,7 +105,7 @@ public interface AttackShape {
         return hit.getType() == HitResult.Type.MISS;
     }
 
-    default boolean intersects(LivingEntity attacker, LivingEntity target) {
+    default boolean intersects(LivingEntity attacker, Entity target) {
         return checkCollision(attacker, target).intersects();
     }
 
@@ -112,7 +114,7 @@ public interface AttackShape {
      * The intersection flag preserves GJK's decision, even if reconstruction fails.
      * Callers requiring an obstruction check must reject an empty overlapPoint.
      */
-    default CollisionResult checkCollision(LivingEntity attacker, LivingEntity target) {
+    default CollisionResult checkCollision(LivingEntity attacker, Entity target) {
         return checkCollision(attacker, target.getBoundingBox());
     }
 
