@@ -8,6 +8,7 @@ import com.zigythebird.playeranimcore.api.firstPerson.FirstPersonMode;
 import com.zigythebird.playeranimcore.enums.PlayState;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -71,6 +72,8 @@ public class EventHandler {
 
         event.setSwingHand(false);
         event.setCanceled(true);
+        // Match vanilla's ordering: synchronize the selected weapon before attacking.
+        mc.player.connection.send(new ServerboundSetCarriedItemPacket(mc.player.getInventory().getSelectedSlot()));
         ClientPacketDistributor.sendToServer(new TryStartAttackPayload());
     }
 

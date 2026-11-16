@@ -4,6 +4,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public record SweepShape(double reach, double sweepAngle, double thickness, double rollAngle) implements AttackShape{
+    public SweepShape {
+        if (!Double.isFinite(reach) || !Double.isFinite(sweepAngle)
+                || !Double.isFinite(thickness) || !Double.isFinite(rollAngle)
+                || reach < 0.0 || thickness < 0.0 || sweepAngle <= 0.0 || sweepAngle >= 180.0)
+            throw new IllegalArgumentException("Invalid dimensions or angles for SweepShape");
+    }
+
     public Vec3 support(LivingEntity attacker, Vec3 direction) {
         var origin = getOrigin(attacker);
 

@@ -1,10 +1,13 @@
 package realcolin.strikeandparry;
 
+import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerSwitchHotbarSlotEvent;
 import net.neoforged.neoforge.event.entity.player.SweepAttackEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -33,6 +36,24 @@ public class EventHandler {
             return;
 
         CombatController.tickCombat(livingEntity);
+    }
+
+    @SubscribeEvent
+    public static void onSwitchHotbarSlot(PlayerSwitchHotbarSlotEvent.Pre event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
+            event.setCanceled(true);
+            player.connection.send(new ClientboundSetHeldSlotPacket(player.getInventory().getSelectedSlot()));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSwapHands(LivingSwapItemsEvent.Hands event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
+            event.setCanceled(true);
+            player.inventoryMenu.sendAllDataToRemote();
+        }
     }
 
     @SubscribeEvent

@@ -1,6 +1,9 @@
 package realcolin.strikeandparry.combat;
 
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class CombatState {
 
@@ -15,12 +18,15 @@ public class CombatState {
     private String comboAttackSetId = null;
     private int comboIndex = 0;
     private Attack activeAttack = null;
+    private ItemStack attackWeapon = ItemStack.EMPTY;
+    private ItemStack attackWeaponSnapshot = ItemStack.EMPTY;
+    private int attackSlot = -1;
 
     public CombatState() {
 
     }
 
-    public boolean startAttack(double attackSpeed, AttackSet attackSet) {
+    public boolean startAttack(double attackSpeed, AttackSet attackSet, LivingEntity attacker) {
         if (attacking) return false;
         if (attackSpeed <= 0.0) return false;
 
@@ -30,6 +36,9 @@ public class CombatState {
         }
 
         this.activeAttack = attackSet.get(comboIndex);
+        this.attackWeapon = attacker.getMainHandItem();
+        this.attackWeaponSnapshot = attackWeapon.copy();
+        this.attackSlot = attacker instanceof Player player ? player.getInventory().getSelectedSlot() : -1;
 
         double windup = activeAttack.windupRatio();
 
@@ -72,11 +81,30 @@ public class CombatState {
         damageTick = 0;
         damageApplied = false;
         activeAttack = null;
+        attackWeapon = ItemStack.EMPTY;
+        attackWeaponSnapshot = ItemStack.EMPTY;
+        attackSlot = -1;
         comboIndex++;
     }
 
     public Attack getAttack() {
         return this.activeAttack;
+    }
+
+    public boolean isAttacking() {
+        return attacking;
+    }
+
+    ItemStack getAttackWeapon() {
+        return attackWeapon;
+    }
+
+    ItemStack getAttackWeaponSnapshot() {
+        return attackWeaponSnapshot;
+    }
+
+    int getAttackSlot() {
+        return attackSlot;
     }
 
     public void reset() {
@@ -88,6 +116,9 @@ public class CombatState {
         comboIndex = 0;
         comboAttackSetId = null;
         activeAttack = null;
+        attackWeapon = ItemStack.EMPTY;
+        attackWeaponSnapshot = ItemStack.EMPTY;
+        attackSlot = -1;
     }
 
 }
