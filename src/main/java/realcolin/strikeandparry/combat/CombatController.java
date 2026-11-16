@@ -25,7 +25,8 @@ public class CombatController {
         if (!started)
             return;
 
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(attacker, new PlayAnimationPayload(attacker.getId(), state.getAttack().id(), attackSpeed));
+        var animSpeed = 20.0 / state.getAttackDurationTicks();
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(attacker, new PlayAnimationPayload(attacker.getId(), state.getAttack().id(), animSpeed));
     }
 
     public static void tickCombat(LivingEntity entity) {

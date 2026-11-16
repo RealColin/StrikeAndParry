@@ -91,6 +91,10 @@ public class CombatState {
         return this.activeAttack;
     }
 
+    public int getAttackDurationTicks() {
+        return this.attackDurationTicks;
+    }
+
     public boolean isAttacking() {
         return attacking;
     }
