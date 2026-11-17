@@ -20,6 +20,10 @@ public class TargetSelector {
                 || !target.isAttackable() || !target.isPickable())
             return false;
 
+        // Do not hit the mount carrying the attacker, including nested vehicles.
+        if (target.hasIndirectPassenger(attacker))
+            return false;
+
         // Explicitly support damageable combat targets, not dropped items or projectiles.
         return target instanceof LivingEntity
                 || target instanceof VehicleEntity
