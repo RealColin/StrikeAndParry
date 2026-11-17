@@ -12,6 +12,19 @@ import realcolin.strikeandparry.network.PlayAnimationPayload;
 public class PayloadHandler {
 
     public static void handlePlayAnimation(PlayAnimationPayload payload, IPayloadContext context) {
+        if (!Double.isFinite(payload.speed()) || payload.speed() <= 0)
+            return;
+
+        // Only the local player's accepted attack controls the input lock.
+        // Start the countdown even if its animation cannot be played below.
+        if (payload.entityId() == context.player().getId()) {
+            if (!context.player().isAlive() || context.player().isSpectator())
+                return;
+
+            ClientState.weaponSwitchTicksRemaining = Math.max(1, (int) Math.round(20.0 / payload.speed()));
+            ClientState.weaponSwitchLocked = true;
+        }
+
         var entity = context.player().level().getEntity(payload.entityId());
 
         if (!(entity instanceof Avatar avatar))
@@ -20,9 +33,6 @@ public class PayloadHandler {
         var layer = PlayerAnimationAccess.getPlayerAnimationLayer(avatar, Constants.PAL_ID);
 
         if (!(layer instanceof PlayerAnimationController controller))
-            return;
-
-        if (!Double.isFinite(payload.speed()) || payload.speed() <= 0)
             return;
 
         controller.removeModifierIf(modifier -> modifier instanceof SpeedModifier);
