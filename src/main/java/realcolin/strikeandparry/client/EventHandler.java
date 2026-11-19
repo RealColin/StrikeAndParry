@@ -107,11 +107,11 @@ public class EventHandler {
 
     @SubscribeEvent
     static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
-        if (event.isPickBlock() && ClientState.weaponSwitchLocked) {
-            event.setSwingHand(false);
-            event.setCanceled(true);
-            return;
-        }
+//        if (event.isPickBlock() && ClientState.weaponSwitchLocked) {
+//            event.setSwingHand(false);
+//            event.setCanceled(true);
+//            return;
+//        }
 
         if (!event.isAttack())
             return;
