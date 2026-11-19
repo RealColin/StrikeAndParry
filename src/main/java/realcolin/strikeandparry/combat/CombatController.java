@@ -46,8 +46,7 @@ public class CombatController {
         var weaponSnapshot = state.getAttackWeaponSnapshot();
         var slot = state.getAttackSlot();
         if (state.isAttacking() && !matchesAttackWeapon(entity, weapon, weaponSnapshot, slot)) {
-            state.reset();
-            return;
+            state.interruptDamage();
         }
 
         var attack = state.tickAttack();
@@ -75,7 +74,7 @@ public class CombatController {
 
         for (var target : targets) {
             if (!matchesAttackWeapon(attacker, weapon, weaponSnapshot, slot)) {
-                attacker.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).reset();
+                attacker.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).interruptDamage();
                 return;
             }
 

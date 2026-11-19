@@ -74,6 +74,12 @@ public class CombatState {
         return toApply;
     }
 
+    /** Suppresses pending damage without ending the attack or shortening its recovery. */
+    public void interruptDamage() {
+        if (attacking)
+            damageApplied = true;
+    }
+
     private void finishAttack() {
         attacking = false;
         attackTick = 0;
