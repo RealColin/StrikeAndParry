@@ -8,7 +8,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerSwitchHotbarSlotEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.SweepAttackEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -53,6 +55,27 @@ public class EventHandler {
                 && player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
             event.setCanceled(true);
             player.inventoryMenu.sendAllDataToRemote();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)
+                || !player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking())
+            return;
+
+        var action = event.getAction();
+        if (action == PlayerInteractEvent.LeftClickBlock.Action.START
+                || action == PlayerInteractEvent.LeftClickBlock.Action.STOP)
+            event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onBreakBlock(BreakBlockEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer player
+                && player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
+            event.setCanceled(true);
+            event.setNotifyClient(true);
         }
     }
 

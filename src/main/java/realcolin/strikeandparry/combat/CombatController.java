@@ -2,6 +2,7 @@ package realcolin.strikeandparry.combat;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -24,6 +25,9 @@ public class CombatController {
         var started = state.startAttack(attackSpeed, attackSet, attacker);
         if (!started)
             return;
+
+        if (attacker instanceof ServerPlayer player)
+            ((BlockBreakingReset) player.gameMode).strikeandparry$resetBlockBreaking();
 
         var animSpeed = 20.0 / state.getAttackDurationTicks();
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(attacker, new PlayAnimationPayload(attacker.getId(), state.getAttack().id(), animSpeed));

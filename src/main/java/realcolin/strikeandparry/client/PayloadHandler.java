@@ -3,6 +3,7 @@ package realcolin.strikeandparry.client;
 import com.zigythebird.playeranim.animation.PlayerAnimationController;
 import com.zigythebird.playeranim.api.PlayerAnimationAccess;
 import com.zigythebird.playeranimcore.animation.layered.modifier.SpeedModifier;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Avatar;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -23,6 +24,10 @@ public class PayloadHandler {
 
             ClientState.weaponSwitchTicksRemaining = Math.max(1, (int) Math.round(20.0 / payload.speed()));
             ClientState.weaponSwitchLocked = true;
+
+            var mc = Minecraft.getInstance();
+            if (mc.gameMode != null)
+                mc.gameMode.stopDestroyBlock();
         }
 
         var entity = context.player().level().getEntity(payload.entityId());

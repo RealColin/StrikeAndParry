@@ -23,6 +23,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import realcolin.strikeandparry.Constants;
 import realcolin.strikeandparry.network.PlayAnimationPayload;
 import realcolin.strikeandparry.network.TryStartAttackPayload;
@@ -106,6 +107,21 @@ public class EventHandler {
     }
 
     @SubscribeEvent
+    static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        if (!event.getLevel().isClientSide() || !ClientState.weaponSwitchLocked)
+            return;
+
+        var action = event.getAction();
+        if (action == PlayerInteractEvent.LeftClickBlock.Action.START
+                || action == PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD) {
+            event.setCanceled(true);
+            var mc = Minecraft.getInstance();
+            if (mc.gameMode != null)
+                mc.gameMode.stopDestroyBlock();
+        }
+    }
+
+    @SubscribeEvent
     static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
 //        if (event.isPickBlock() && ClientState.weaponSwitchLocked) {
 //            event.setSwingHand(false);
@@ -126,8 +142,15 @@ public class EventHandler {
         var hitResult = mc.hitResult;
         var stack = mc.player.getMainHandItem();
 
-        if (hitResult != null && hitResult.getType() == HitResult.Type.BLOCK && canMine(stack))
+        if (hitResult != null && hitResult.getType() == HitResult.Type.BLOCK && canMine(stack)) {
+            if (ClientState.weaponSwitchLocked) {
+                event.setSwingHand(false);
+                event.setCanceled(true);
+                if (mc.gameMode != null)
+                    mc.gameMode.stopDestroyBlock();
+            }
             return;
+        }
 
         event.setSwingHand(false);
         event.setCanceled(true);
