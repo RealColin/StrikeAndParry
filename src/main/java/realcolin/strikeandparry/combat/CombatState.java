@@ -15,12 +15,13 @@ public class CombatState {
     private int damageTick = 0;
     private boolean damageApplied = false;
 
-    private String comboAttackSetId = null;
-    private int comboIndex = 0;
+    private String attackSetId = null;
+    private int attackIndex = 0;
     private Attack activeAttack = null;
     private ItemStack attackWeapon = ItemStack.EMPTY;
     private ItemStack attackWeaponSnapshot = ItemStack.EMPTY;
     private int attackSlot = -1;
+    private int ticksUntilIndexReset = 0;
 
     public CombatState() {
 
@@ -30,12 +31,12 @@ public class CombatState {
         if (attacking) return false;
         if (attackSpeed <= 0.0) return false;
 
-        if (!attackSet.id().equals(comboAttackSetId)) {
-            comboAttackSetId = attackSet.id();
-            comboIndex = 0;
+        if (!attackSet.id().equals(attackSetId)) {
+            attackSetId = attackSet.id();
+            attackIndex = 0;
         }
 
-        this.activeAttack = attackSet.get(comboIndex);
+        this.activeAttack = attackSet.get(attackIndex);
         this.attackWeapon = attacker.getMainHandItem();
         this.attackWeaponSnapshot = attackWeapon.copy();
         this.attackSlot = attacker instanceof Player player ? player.getInventory().getSelectedSlot() : -1;
@@ -50,13 +51,22 @@ public class CombatState {
         this.attackTick = 0;
         this.damageApplied = false;
         this.attacking = true;
+        ticksUntilIndexReset = 40;
 
         return true;
     }
 
     public Attack tickAttack() {
-        if (!attacking)
+        if (!attacking) {
+            if (ticksUntilIndexReset > 0) {
+                ticksUntilIndexReset--;
+
+                if (ticksUntilIndexReset == 0)
+                    attackIndex = 0;
+            }
+
             return null;
+        }
 
         attackTick++;
 
@@ -90,7 +100,7 @@ public class CombatState {
         attackWeapon = ItemStack.EMPTY;
         attackWeaponSnapshot = ItemStack.EMPTY;
         attackSlot = -1;
-        comboIndex++;
+        attackIndex++;
     }
 
     public Attack getAttack() {
@@ -123,12 +133,13 @@ public class CombatState {
         this.attackDurationTicks = 0;
         this.damageTick = 0;
         this.damageApplied = false;
-        comboIndex = 0;
-        comboAttackSetId = null;
+        attackIndex = 0;
+        attackSetId = null;
         activeAttack = null;
         attackWeapon = ItemStack.EMPTY;
         attackWeaponSnapshot = ItemStack.EMPTY;
         attackSlot = -1;
+        ticksUntilIndexReset = 0;
     }
 
 }

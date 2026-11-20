@@ -7,6 +7,10 @@
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerGameModeMixin"
   ],
+  "client": [
+    "HudMixin",
+    "ItemModelResolverMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
