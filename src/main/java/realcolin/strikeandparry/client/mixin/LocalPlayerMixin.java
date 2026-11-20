@@ -26,10 +26,13 @@ public abstract class LocalPlayerMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;itemUseSpeedMultiplier()F")
     )
     private float strikeandparry$attackMovementMultiplier(float multiplier) {
-        // Preserve stronger item-use slowdowns without multiplying the two penalties together.
-        return strikeandparry$isAttackMovementSlowed()
-                ? Math.min(multiplier, Constants.ATTACK_MOVEMENT_SPEED_MULTIPLIER)
-                : multiplier;
+        if (!strikeandparry$isAttackMovementSlowed())
+            return multiplier;
+
+        var player = (LocalPlayer) (Object) this;
+        var attackMultiplier = Constants.ATTACK_MOVEMENT_SPEED_MULTIPLIER;
+        // The default item-use multiplier also exists when no item is being used.
+        return player.isUsingItem() ? Math.min(multiplier, attackMultiplier) : attackMultiplier;
     }
 
     @ModifyReturnValue(method = "isSprintingPossible", at = @At("RETURN"))
