@@ -73,6 +73,9 @@ public class EventHandler {
         event.register(PlayAnimationPayload.TYPE, PayloadHandler::handlePlayAnimation);
     }
 
+    /*
+        These two are needed to make sure nothing breaks in the CombatState on Player logout or respawn.
+     */
     @SubscribeEvent
     static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         resetClientAttackState();
@@ -83,6 +86,7 @@ public class EventHandler {
         resetClientAttackState();
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Pre event) {
         var mc = Minecraft.getInstance();
@@ -94,19 +98,20 @@ public class EventHandler {
         if (mc.isPaused())
             return;
 
+        /*
+            Empty while loops because the consumeClick methods update variables for some reason.
+            The purpose of this is to discard input related to switching slots on the hotbar during
+            an attack, so that it doesn't visually rubber-band due to the server rejecting the action.
+         */
         if (ClientState.weaponSwitchLocked) {
-            for (var key : mc.options.keyHotbarSlots) {
-                while (key.consumeClick()) {
-                    // Discard queued slot changes before vanilla handles them.
-                }
-            }
+            for (var key : mc.options.keyHotbarSlots)
+                while (key.consumeClick())
+                    ;
 
-            while (mc.options.keySwapOffhand.consumeClick()) {
-                // Discard queued hand swaps rather than delaying them until unlock.
-            }
+            while (mc.options.keySwapOffhand.consumeClick())
+                ;
         }
 
-        // One tick for a pending request; the full duration once the attack is accepted.
         if (ClientState.weaponSwitchTicksRemaining > 0) {
             ClientState.weaponSwitchTicksRemaining--;
 
@@ -121,6 +126,9 @@ public class EventHandler {
             event.setCanceled(true);
     }
 
+    /*
+        Stop the block break animation from playing on the client during an attack.
+     */
     @SubscribeEvent
     static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (!event.getLevel().isClientSide() || !ClientState.weaponSwitchLocked)
@@ -136,13 +144,14 @@ public class EventHandler {
         }
     }
 
+    // TODO this needs to be cleaned up, reorganized, properly commented, etc
     @SubscribeEvent
     static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
-//        if (event.isPickBlock() && ClientState.weaponSwitchLocked) {
-//            event.setSwingHand(false);
-//            event.setCanceled(true);
-//            return;
-//        }
+        if (event.isPickBlock() && ClientState.weaponSwitchLocked) {
+            event.setSwingHand(false);
+            event.setCanceled(true);
+            return;
+        }
 
         if (!event.isAttack())
             return;
