@@ -1,4 +1,4 @@
-package realcolin.strikeandparry.mixin;
+package realcolin.strikeandparry.client.mixin;
 
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.tags.ItemTags;

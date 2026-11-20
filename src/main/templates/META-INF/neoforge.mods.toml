@@ -18,6 +18,9 @@ An overhaul of the Minecraft combat system that adds more dynamic and skill-base
 [[mixins]]
 config="${mod_id}.mixins.json"
 
+[[mixins]]
+config="${mod_id}.client.mixins.json"
+
 #[[accessTransformers]]
 #file="META-INF/accesstransformer.cfg"
 

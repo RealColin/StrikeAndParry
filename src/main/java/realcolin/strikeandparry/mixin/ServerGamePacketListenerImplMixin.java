@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -113,6 +114,23 @@ public abstract class ServerGamePacketListenerImplMixin {
 
         if (player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
             player.inventoryMenu.sendAllDataToRemote();
+            ci.cancel();
+        }
+    }
+
+    @Inject(
+            method = "handlePlayerCommand",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/server/level/ServerLevel;)V",
+                    shift = At.Shift.AFTER
+            ),
+            cancellable = true
+    )
+    private void strikeandparry$blockAttackSprinting(ServerboundPlayerCommandPacket packet, CallbackInfo ci) {
+        if (packet.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING
+                && player.getData(StrikeandParry.COMBAT_STATE_ATTACHMENT).isAttacking()) {
+            player.setSprinting(false);
             ci.cancel();
         }
     }

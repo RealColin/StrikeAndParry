@@ -1,4 +1,4 @@
-package realcolin.strikeandparry.mixin;
+package realcolin.strikeandparry.client.mixin;
 
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.OptionInstance;

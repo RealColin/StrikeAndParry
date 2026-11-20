@@ -1,5 +1,6 @@
 package realcolin.strikeandparry;
 
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -17,6 +18,11 @@ public class StrikeandParry {
 
     public static final Supplier<AttachmentType<CombatState>> COMBAT_STATE_ATTACHMENT = ATTACHMENT_TYPES.register(
             "combat_state", () -> AttachmentType.builder(CombatState::new).build());
+
+    public static final Supplier<AttachmentType<Boolean>> ATTACK_MOVEMENT_SLOWED = ATTACHMENT_TYPES.register(
+            "attack_movement_slowed", () -> AttachmentType.builder(() -> false)
+                    .sync((holder, player) -> holder == player, ByteBufCodecs.BOOL)
+                    .build());
 
     public StrikeandParry(IEventBus modEventBus, ModContainer modContainer) {
 

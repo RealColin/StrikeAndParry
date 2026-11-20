@@ -26,6 +26,8 @@ public class CombatController {
         if (!started)
             return;
 
+        syncAttackMovement(attacker, state);
+
         if (attacker instanceof ServerPlayer player)
             ((BlockBreakingReset) player.gameMode).strikeandparry$resetBlockBreaking();
 
@@ -38,6 +40,7 @@ public class CombatController {
 
         if (!entity.isAlive() || entity.isSpectator()) {
             state.reset();
+            syncAttackMovement(entity, state);
             return;
         }
 
@@ -50,10 +53,23 @@ public class CombatController {
         }
 
         var attack = state.tickAttack();
+        syncAttackMovement(entity, state);
         if (attack == null)
             return;
 
         applyAttack(entity, attack, weapon, weaponSnapshot, slot);
+    }
+
+    private static void syncAttackMovement(LivingEntity entity, CombatState state) {
+        if (!(entity instanceof ServerPlayer player))
+            return;
+
+        var attacking = state.isAttacking();
+        if (player.getData(StrikeandParry.ATTACK_MOVEMENT_SLOWED) != attacking)
+            player.setData(StrikeandParry.ATTACK_MOVEMENT_SLOWED, attacking);
+
+        if (attacking)
+            player.setSprinting(false);
     }
 
     private static boolean matchesAttackWeapon(LivingEntity attacker, ItemStack weapon, ItemStack snapshot, int slot) {
